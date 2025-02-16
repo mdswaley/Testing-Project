@@ -50,5 +50,14 @@ class EmployeeServiceTest {
 //        Then
         assertThat(employeeDto.getId()).isEqualTo(mockEmp.getId());
         assertThat(employeeDto.getEmail()).isEqualTo(mockEmp.getEmail());
+        verify(employeeRepository).findById(id); // it says that whether the given method was called or
+        // interact with mock or not.
+
+        verify(employeeRepository, times(1)).findById(id); // verifying how many times it was called.
+        // or atMost(5) means 5 or less ,
+        // only() means only findById was called,
+        // timeout(1000L) means verifying method was called with in given second.
+        // time(no. of time) means verifying method was called given no. of times or not.
+        // never() means verifying that a method was never called.
     }
 }
