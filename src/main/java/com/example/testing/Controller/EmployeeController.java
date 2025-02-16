@@ -28,7 +28,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addEmp(@RequestParam EmployeeDto emp){
+    public ResponseEntity<EmployeeDto> addEmp(@RequestParam EmployeeDto emp){
         return ResponseEntity.ok(employeeService.addEmp(emp));
     }
 

@@ -4,6 +4,7 @@ import com.example.testing.DTO.EmployeeDto;
 import com.example.testing.Entity.EmployeeClass;
 import com.example.testing.Repository.EmployeeRepository;
 import com.example.testing.TestContainerConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Import(TestContainerConfig.class)
@@ -34,20 +36,34 @@ class EmployeeServiceTest {
     @InjectMocks // this is use for inject the mocks and create a bean as well
     private EmployeeService employeeService;
 
-    @Test
-    void testGetEmpById_whenEmpIsPresent_thenReturnEmpDto(){
-//        Given
-        Long id = 1L;
-        EmployeeClass mockEmp = EmployeeClass.builder()
+    @Mock
+    private EmployeeClass mockEmp;
+
+    @Mock
+    private EmployeeDto mockEmpDto;
+
+    @BeforeEach
+    void setUp(){
+        mockEmp = EmployeeClass.builder()
+                .id(1L)
                 .name("MD")
                 .email("mdswaley@gmail.com")
                 .age(21)
                 .salary(20000)
                 .build();
+
+        mockEmpDto = modelMapper.map(mockEmp,EmployeeDto.class);
+    }
+
+    @Test
+    void testGetEmpById_whenEmpIsPresent_thenReturnEmpDto(){
+//        Given
+        Long id = 1L;
         when(employeeRepository.findById(id)).thenReturn(Optional.of(mockEmp));
 //        When
         EmployeeDto employeeDto = employeeService.getById(id);
 //        Then
+        assertThat(employeeDto).isNotNull();
         assertThat(employeeDto.getId()).isEqualTo(mockEmp.getId());
         assertThat(employeeDto.getEmail()).isEqualTo(mockEmp.getEmail());
         verify(employeeRepository).findById(id); // it says that whether the given method was called or
@@ -59,5 +75,19 @@ class EmployeeServiceTest {
         // timeout(1000L) means verifying method was called with in given second.
         // time(no. of time) means verifying method was called given no. of times or not.
         // never() means verifying that a method was never called.
+    }
+
+//    create emp test
+    @Test
+    void testCreateNewEmp_whenValidEmp_thenCreateNew(){
+//        given
+        when(employeeRepository.findByEmail(anyString())).thenReturn(List.of());
+        when(employeeRepository.save(any(EmployeeClass.class))).thenReturn(mockEmp);
+//        when
+        EmployeeDto employeeDto = employeeService.addEmp(mockEmpDto);
+//        then
+        assertThat(employeeDto).isNotNull();
+        assertThat(employeeDto.getEmail()).isEqualTo(mockEmp.getEmail());
+        verify(employeeRepository).save(any(EmployeeClass.class));
     }
 }

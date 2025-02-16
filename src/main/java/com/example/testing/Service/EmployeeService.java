@@ -42,7 +42,7 @@ public class EmployeeService {
         return modelMapper.map(emp,EmployeeDto.class);
     }
 
-    public String addEmp(EmployeeDto employeeDto){
+    public EmployeeDto addEmp(EmployeeDto employeeDto){
         log.info("Creating new employee with email: {}", employeeDto.getEmail());
         List<EmployeeClass> existingEmployees = employeeRepository.findByEmail(employeeDto.getEmail());
         if (!existingEmployees.isEmpty()) {
@@ -50,9 +50,9 @@ public class EmployeeService {
             throw new RuntimeException("Employee already exists with email: " + employeeDto.getEmail());
         }
         EmployeeClass emp = modelMapper.map(employeeDto,EmployeeClass.class);
-        employeeRepository.save(emp);
+        EmployeeClass saveEmp = employeeRepository.save(emp);
         log.info("Successfully created new employee with id: {}", emp.getId());
-        return "Employee ADD Successfully";
+        return modelMapper.map(saveEmp,EmployeeDto.class);
     }
 
     public EmployeeDto updateEmp(Long id, EmployeeDto employeeDto){
