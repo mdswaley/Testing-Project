@@ -7,6 +7,7 @@ import com.example.testing.TestContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -86,8 +87,15 @@ class EmployeeServiceTest {
 //        when
         EmployeeDto employeeDto = employeeService.addEmp(mockEmpDto);
 //        then
+
+        ArgumentCaptor<EmployeeClass> employeeClassArrgumentCaptor = ArgumentCaptor.forClass(EmployeeClass.class);
+        verify(employeeRepository).save(employeeClassArrgumentCaptor.capture());
+
+        EmployeeClass captorEmp = employeeClassArrgumentCaptor.getValue();
+
         assertThat(employeeDto).isNotNull();
         assertThat(employeeDto.getEmail()).isEqualTo(mockEmp.getEmail());
+        assertThat(captorEmp.getEmail()).isEqualTo(mockEmp.getEmail());
         verify(employeeRepository).save(any(EmployeeClass.class));
     }
 }
