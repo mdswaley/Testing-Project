@@ -2,6 +2,7 @@ package com.example.testing.Service;
 
 import com.example.testing.DTO.EmployeeDto;
 import com.example.testing.Entity.EmployeeClass;
+import com.example.testing.Exceptions.ResourceNotFoundException;
 import com.example.testing.Repository.EmployeeRepository;
 import com.example.testing.TestContainerConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -76,6 +78,18 @@ class EmployeeServiceTest {
         // timeout(1000L) means verifying method was called with in given second.
         // time(no. of time) means verifying method was called given no. of times or not.
         // never() means verifying that a method was never called.
+    }
+
+//    if employee with id is not found
+    @Test
+    void whenEmpWithId_isNotPresent_ThrowAnException(){
+//        given
+        when(employeeRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+//        when and then
+        assertThatThrownBy(()-> employeeService.getById(1L))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Employee not found with id: 1");
     }
 
 //    create emp test
