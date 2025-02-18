@@ -13,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
+@EqualsAndHashCode
 public class EmployeeClass {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

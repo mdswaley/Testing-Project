@@ -6,11 +6,9 @@ import com.example.testing.Exceptions.ResourceNotFoundException;
 import com.example.testing.Repository.EmployeeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +23,7 @@ public class EmployeeService {
     }
 
     public List<EmployeeDto> getAllEmp(){
+        log.info("Fetching Get All Employee");
         List<EmployeeClass> emp = employeeRepository.findAll();
         return emp.stream()
                 .map(emp1 -> modelMapper.map(emp1,EmployeeDto.class))
