@@ -28,8 +28,9 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> addEmp(@RequestParam EmployeeDto emp){
-        return ResponseEntity.ok(employeeService.addEmp(emp));
+    public ResponseEntity<EmployeeDto> addEmp(@RequestBody EmployeeDto emp){
+        EmployeeDto createdEmployeeDto = employeeService.addEmp(emp);
+        return new ResponseEntity<>(createdEmployeeDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

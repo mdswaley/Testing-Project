@@ -218,7 +218,7 @@ class EmployeeServiceTest {
     void testEmpDelete_whenEmpExist_thenDelete(){
         when(employeeRepository.existsById(mockEmpDto.getId())).thenReturn(true);
 
-//        we use assertThatCode when method doesn't return any think but may be throws an exception
+//        we use assertThatCode when method doesn't return any think but may be thrown an exception
         assertThatCode(()->employeeService.deleteEmp(mockEmp.getId()))
                 .doesNotThrowAnyException();
 

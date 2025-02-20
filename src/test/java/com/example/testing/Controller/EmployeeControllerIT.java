@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Import(TestContainerConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // This starts the application with a random available port and allows WebTestClient to interact with it
@@ -43,25 +44,70 @@ class EmployeeControllerIT {
                 .salary(5000)
                 .email("md@gmail.com")
                 .build();
-        testEmployeeDto = modelMapper.map(testEmployeeClass,EmployeeDto.class);
-        testEmployeeDto.setId(1L);
+
+        testEmployeeDto = EmployeeDto.builder()
+                .id(1L)
+                .name("Swaley")
+                .age(21)
+                .salary(5000)
+                .email("md@gmail.com")
+                .build();
+
+        employeeRepository.deleteAll();
     }
 
+//  get employee by id
     @Test
     void testGetEmpById_ifSuccess(){
         EmployeeClass savedEmp = employeeRepository.save(testEmployeeClass);
+
         webTestClient.get()
                 .uri("/emp/{id}",savedEmp.getId()) //in uri already define baseUrl like (localhost://8080) no need to define
-                .exchange() // it takes all request and give response
-                .expectStatus() // it is like assert we can check whether data is found or not like wise.
+                .exchange() // it executes the request and return a webClient response
+                .expectStatus() // it is like assert return the status code of response
                 .isOk()
-                .expectBody(EmployeeDto.class) // this map our json data to class fields
+                .expectBody(EmployeeDto.class) // assert the body of response.
 //                .isEqualTo(testEmployeeDto); // make sure DTO class should have equals and hashCode implementation.
 //                Else we can use value which take emp from response body then make sure are equals to the expected value.
                 .value(employeeDto -> {
-                    assertThat(employeeDto.getEmail()).isEqualTo(testEmployeeDto.getEmail());
-                    assertThat(employeeDto.getId()).isEqualTo(testEmployeeDto.getId());
+                    assertThat(employeeDto.getEmail()).isEqualTo(savedEmp.getEmail());
+                    assertThat(employeeDto.getId()).isEqualTo(savedEmp.getId());
                 });
+    }
+
+    @Test
+    void testGetEmpById_ifNotFound(){
+        webTestClient.get()
+                .uri("/emp/1")
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+//    create new employee
+    @Test
+    void testCreateEmp_whenEmpAlreadyExist_throwException(){
+        EmployeeClass savedEmp = employeeRepository.save(testEmployeeClass);
+
+        webTestClient.post()
+                .uri("/emp")
+                .bodyValue(testEmployeeDto)
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+    }
+
+    @Test
+    void testCreate_whenEmpIsNotExist_thenCreateEmployee(){
+
+        webTestClient.post()
+                .uri("/emp")
+                .bodyValue(testEmployeeClass)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody()
+                .jsonPath("$.email").isEqualTo(testEmployeeDto.getEmail());
     }
 
 }
