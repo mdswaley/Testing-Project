@@ -56,6 +56,7 @@ public class EmployeeService {
 
     public EmployeeDto updateEmp(Long id, EmployeeDto employeeDto){
         log.info("Updating employee with id: {}", id);
+
         EmployeeClass employee = employeeRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Employee not found with id: {}", id);
